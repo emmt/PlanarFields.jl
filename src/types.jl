@@ -116,3 +116,12 @@ end
 
 # Union of types having a given step.
 const WithStep = Union{GridAxis,Grid,PlanarField}
+
+"""
+    PlanarFields.Boxable
+
+is the union of types of geometric objects that have a bounding-box and that can be used
+to define a grid of equally spaced nodes.
+
+"""
+const Boxable = Union{ShapeElement,Mask,BoundingBox}

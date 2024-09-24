@@ -137,7 +137,7 @@ Build a 2-dimensional grid of equally spaced nodes. Possible arguments are:
   the grid.
 
 Type parameter `T` is to specify the type (possibly with units) of the coordinates. If `T`
-is not specified, it is inferred from the arguments or from the `step` keyword.
+is not specified, it is inferred from the grid step.
 
 A grid object is an abstract matrix with Cartesian indexing and whose element type is
 `Point{T}`.
@@ -216,9 +216,9 @@ TwoDimensional.coord_type(G::Grid) = coord_type(typeof(G))
 TwoDimensional.coord_type(::Type{<:Grid{T}}) where {T} = T
 
 """
-    Grid{T}(step, arr) -> G
-    Grid{T}(arr; step) -> G
-    Grid{T}(arr, step) -> G
+    G = Grid{T}(step, arr)
+    G = Grid{T}(arr, step)
+    G = Grid{T}(arr; step)
 
 Build a 2-dimensional grid of nodes equally spaced by `step` and with the same indices as
 array `arr`. Optional type parameter `T` is the coordinate type of the grid nodes. By
@@ -226,43 +226,50 @@ default, `T = typeof(step)`.
 
 """
 Grid{T}(step::Number, arr::AbstractMatrix) where {T<:Number} = Grid(as(T, step), axes(arr))
-Grid{T}(arr::AbstractMatrix; step::Number) where {T<:Number} = Grid{T}(step, arr)
 Grid{T}(arr::AbstractMatrix, step::Number) where {T<:Number} = Grid{T}(step, arr)
+Grid{T}(arr::AbstractMatrix; step::Number) where {T<:Number} = Grid{T}(step, arr)
 
 Grid(step::Number, arr::AbstractMatrix) = Grid(step, axes(arr))
 Grid(arr::AbstractMatrix; step::Number) = Grid(step, arr)
 Grid(arr::AbstractMatrix, step::Number) = Grid(step, arr)
 
 """
-    Grid{T}(shape; step, margin=$(default_margin)) -> G
-    Grid(shape; step, margin=$(default_margin)) -> G
+    G = Grid{T}(step, obj; margin=$(default_margin))
+    G = Grid{T}(obj, step; margin=$(default_margin))
+    G = Grid{T}(obj; step, margin=$(default_margin))
 
-Build a 2-dimensional grid of equally spaced nodes for sampling the `shape` object with a
-given `step`. The grid is large enough to encompass the shape with some margin(s)
-specified as a number of grid nodes by the `margin` keyword. The default margin of
-`$(default_margin)` is to ensure that the shape is not cropped when it is sampled on the
-grid with antialiasing. The `shape` object may be cropped if any of the margin is less
-than `1//2`.
+Build a 2-dimensional grid of equally spaced nodes for sampling the geometric object `obj`
+(e.g. a shaped object, a mask element, a mask, a bounding box, etc.) with a given `step`.
+The grid is large enough to encompass the object with some margin(s) specified as a number
+of grid nodes by the `margin` keyword. The default margin of `$(default_margin)` is to
+ensure that the object is not cropped when it is sampled on the grid with antialiasing.
+The object may be cropped if any of the margin is less than `1//2`.
 
-Optional type parameter `T` is the coordinate type of the grid nodes.
-
-The `shape` argument may also be a simple bounding-box.
+Optional type parameter `T` is the coordinate type of the grid nodes. By default, `T` is
+inferred from the types of the step and of the coordinates of `obj`.
 
 """
-Grid(shape::ShapeElement; kwds...) = Grid(BoundingBox(shape); kwds...)
-Grid{T}(shape::ShapeElement; kwds...) where {T<:Number} = Grid{T}(BoundingBox(shape); kwds...)
-
-function Grid(box::BoundingBox; step::Number, kwds...)
+function Grid(step::Number, box::BoundingBox; kwds...)
     T = promote_type(coord_type(box), typeof(step))
-    return Grid{T}(box, step=step, kwds...)
+    return Grid{T}(step, box; kwds...)
 end
 
-function Grid{T}(box::BoundingBox; step::Number, margin::Real = default_margin) where {T<:Number}
+function Grid{T}(step::Number, box::BoundingBox; margin::Real = default_margin) where {T<:Number}
     step = as(T, step)
-    I = floor(Int, box.xmin/step - margin) : ceil(Int, box.xmax/step + margin)
-    J = floor(Int, box.ymin/step - margin) : ceil(Int, box.ymax/step + margin)
+    I = floor(Int, as(T, box.xmin)/step - margin) : ceil(Int, as(T, box.xmax)/step + margin)
+    J = floor(Int, as(T, box.ymin)/step - margin) : ceil(Int, as(T, box.ymax)/step + margin)
     return Grid(step, I, J)
 end
+
+Grid(obj::Boxable, step::Number, kwds...) = Grid(step, obj; kwds...)
+Grid(obj::Boxable; step::Number, kwds...) = Grid(step, obj; kwds...)
+
+Grid{T}(obj::Boxable, step::Number, kwds...) where {T<:Number} = Grid{T}(step, obj; kwds...)
+Grid{T}(obj::Boxable; step::Number, kwds...) where {T<:Number} = Grid{T}(step, obj; kwds...)
+
+Grid(step::Number, obj::Boxable; kwds...) = Grid(step, BoundingBox(obj); kwds...)
+Grid{T}(step::Number, obj::Boxable; kwds...) where {T<:Number} =
+    Grid{T}(step, BoundingBox(obj); kwds...)
 
 """
     T = PlanarFields.promote_step_type(step)
