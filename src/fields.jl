@@ -211,9 +211,9 @@ assumed.
 The bounding-box of the mask and the node spacing are used to determine the indices of the
 grid as follows:
 
-   grid = Grid{S}(mask; step=step, margins=margins)
+   grid = Grid{S}(mask; step=step, margin=margin)
 
-where keyword `margins` is an optional keywords. Other keywords are passed to
+where keyword `margin` is an optional keywords. Other keywords are passed to
 `TwoDimensional.forge_mask!`.
 
 """
@@ -240,9 +240,9 @@ PlanarField{T}(step::Number, mask::Union{MaskElement,Mask}; kwds...) where {T} =
     PlanarField{T}(mask; step = step, kwds...)
 
 function PlanarField{T,S}(mask::Union{MaskElement,Mask}; step::Number,
-                          margins=1//2, kwds...) where {T,S<:Number}
+                          margin=default_margin, kwds...) where {T,S<:Number}
     box = BoundingBox(mask)
-    grid = Grid{S}(box; step=step, margins=margins)
+    grid = Grid{S}(box; step=step, margin=margin)
     return  PlanarField{T}(grid, mask; kwds...)
 end
 

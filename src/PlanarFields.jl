@@ -20,6 +20,8 @@ using TwoDimensional: Mask, MaskElement, ShapeElement, dot, ⋅
 using Base: axes1
 using Base.Broadcast: broadcasted
 
+const default_margin = 1//2
+
 include("types.jl")
 include("utils.jl")
 include("grids.jl")

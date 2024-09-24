@@ -234,16 +234,15 @@ Grid(arr::AbstractMatrix; step::Number) = Grid(step, arr)
 Grid(arr::AbstractMatrix, step::Number) = Grid(step, arr)
 
 """
-    Grid{T}(shape; step, margins=1//2) -> G
-    Grid(shape; step, margins=1//2) -> G
+    Grid{T}(shape; step, margin=$(default_margin)) -> G
+    Grid(shape; step, margin=$(default_margin)) -> G
 
-Build a 2-dimensional grid of nodes for sampling the `shape` object with a given `step`.
-The grid is large enough to encompass the shape with some margin(s) specified as a number
-of grid nodes by the `margins` keyword as a single value (the same marging for the two
-dimensions) or as a 2-tuple of values (one for each of the two dimensions). The default
-margins of `1//2` is to ensure that the shape is not cropped when it is sampled on the
-grid with antialiasing. The shape may be cropped if any of the margins is less than
-`1//2`.
+Build a 2-dimensional grid of equally spaced nodes for sampling the `shape` object with a
+given `step`. The grid is large enough to encompass the shape with some margin(s)
+specified as a number of grid nodes by the `margin` keyword. The default margin of
+`$(default_margin)` is to ensure that the shape is not cropped when it is sampled on the
+grid with antialiasing. The `shape` object may be cropped if any of the margin is less
+than `1//2`.
 
 Optional type parameter `T` is the coordinate type of the grid nodes.
 
@@ -258,19 +257,11 @@ function Grid(box::BoundingBox; step::Number, kwds...)
     return Grid{T}(box, step=step, kwds...)
 end
 
-function Grid{T}(box::BoundingBox; step::Number,
-                 margins::Union{Real,NTuple{2,Real}} = 1//2) where {T<:Number}
+function Grid{T}(box::BoundingBox; step::Number, margin::Real = default_margin) where {T<:Number}
     step = as(T, step)
-    margin1, margin2 = if margins isa Real
-        margins, margins
-    else
-        margins
-    end
-    min1 = floor(Int, box.xmin/step - margin1)
-    max1 =  ceil(Int, box.xmax/step + margin1)
-    min2 = floor(Int, box.ymin/step - margin2)
-    max2 =  ceil(Int, box.ymax/step + margin2)
-    return Grid(step, min1:max1, min2:max2)
+    I = floor(Int, box.xmin/step - margin) : ceil(Int, box.xmax/step + margin)
+    J = floor(Int, box.ymin/step - margin) : ceil(Int, box.ymax/step + margin)
+    return Grid(step, I, J)
 end
 
 """
