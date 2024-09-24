@@ -154,7 +154,7 @@ Arguments may also be two instances of objects having a defined grid step.
 
 """
 function common_step(s1::T1, s2::T2) where {T1<:Number,T2<:Number}
-    T = to_same_concrete_type(T1, T2) # type of the result
+    T = to_same_type(T1, T2) # type of the result
     r1, r2 = as(T, s1), as(T, s2)
     if r1 === r2
         return r1

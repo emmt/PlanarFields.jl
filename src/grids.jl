@@ -87,7 +87,7 @@ end
 # that the offset is a multiple of the step.
 Broadcast.broadcasted(::typeof(+), off::Number, A::GridAxis) = broadcasted(+, A, off)
 function Broadcast.broadcasted(::typeof(+), A::GridAxis, off::Number)
-    off, stp = to_same_concrete_type(off, step(A))
+    off, stp = to_same_type(off, step(A))
     if bare_type(off) <: Integer
         iszero(rem(off, stp)) || error("offset is not a multiple of the step")
         i = div(off, stp)
