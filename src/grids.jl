@@ -15,13 +15,13 @@ Examples:
     A = GridAxis(0.1u"mm", -5:11)
 
 """
-GridAxis(inds::ArrayAxisLike; step::Number) = GridAxis(step, inds)
-GridAxis(inds::ArrayAxisLike, step::Number) = GridAxis(step, inds)
-GridAxis(step::Number, inds::ArrayAxisLike) = GridAxis(step, to_axis(inds))
+GridAxis(rng::ArrayAxisLike; step::Number) = GridAxis(step, rng)
+GridAxis(rng::ArrayAxisLike, step::Number) = GridAxis(step, rng)
+GridAxis(step::Number, rng::ArrayAxisLike) = GridAxis(step, as_array_axis(rng))
 
-GridAxis{T}(inds::ArrayAxisLike; step::Number) where {T<:Number} = GridAxis{T}(step, inds)
-GridAxis{T}(inds::ArrayAxisLike, step::Number) where {T<:Number} = GridAxis{T}(step, inds)
-GridAxis{T}(step::Number, inds::ArrayAxisLike) where {T<:Number} = GridAxis{T}(step, to_axis(inds))
+GridAxis{T}(rng::ArrayAxisLike; step::Number) where {T<:Number} = GridAxis{T}(step, rng)
+GridAxis{T}(rng::ArrayAxisLike, step::Number) where {T<:Number} = GridAxis{T}(step, rng)
+GridAxis{T}(step::Number, rng::ArrayAxisLike) where {T<:Number} = GridAxis{T}(step, as_array_axis(rng))
 
 # Copy/convert constructors for GridAxis objects.
 GridAxis(A::GridAxis) = A
@@ -161,10 +161,10 @@ Grid{T}(step::Number, I::ArrayAxisLike, J::ArrayAxisLike) where {T<:Number} = Gr
 
 Grid(inds::ArrayAxesLike{2}; step::Number) = Grid(step, inds)
 Grid(inds::ArrayAxesLike{2}, step::Number) = Grid(step, inds)
-Grid(step::Number, inds::ArrayAxesLike{2}) = Grid(step, to_axes(inds))
+Grid(step::Number, inds::ArrayAxesLike{2}) = Grid(step, as_array_axes(inds))
 Grid{T}(inds::ArrayAxesLike{2}; step::Number) where {T<:Number} = Grid{T}(step, inds)
 Grid{T}(inds::ArrayAxesLike{2}, step::Number) where {T<:Number} = Grid{T}(step, inds)
-Grid{T}(step::Number, inds::ArrayAxesLike{2}) where {T<:Number} = Grid{T}(step, to_axes(inds))
+Grid{T}(step::Number, inds::ArrayAxesLike{2}) where {T<:Number} = Grid{T}(step, as_array_axes(inds))
 
 Grid((X, Y)::NTuple{2,GridAxis}) = Grid(X, Y)
 function Grid(X::GridAxis, Y::GridAxis)
@@ -304,23 +304,3 @@ helper function is needed by the inner constructors of [`GridAxis`](@ref) and of
     -oneunit(T) < zero(T) || throw(ArgumentError("grid step type `T = $T` is unsigned"))
     return nothing
 end
-
-"""
-    PlanarFields.to_axis(x)
-
-converts `x` to an array axis, that is an `Int`-valued unit range.
-
-"""
-to_axis(x::ArrayAxis) = x
-to_axis(x::ArrayAxisLike) = as(ArrayAxis, x)
-to_axis(x::Integer) = Base.OneTo{Int}(x)
-
-"""
-    PlanarFields.to_axes(x...)
-
-converts `x...` to array axes, that is a tuple of `Int`-valued unit ranges.
-
-"""
-to_axes(x::ArrayAxes) = x
-to_axes(x::Union{Integer,ArrayAxisLike}...) = to_axes(x)
-to_axes(x::Tuple{Vararg{Union{Integer,ArrayAxisLike}}}) = map(to_axis, x)

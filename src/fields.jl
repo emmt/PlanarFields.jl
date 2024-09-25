@@ -25,7 +25,7 @@ by `A[I]`. The position of a node at Cartesian index `I` is given by `step*Point
 
 """
 PlanarField{T}(grid::Grid) where {T} =
-    PlanarField(OffsetArray(Array{T}(undef, size(grid)), axes(grid)), step(grid))
+    PlanarField(new_array(T, axes(grid)), step(grid))
 
 # Build a planar grid from arguments and keywords.
 PlanarField{T}(args...; kwds...) where {T} = PlanarField{T}(Grid(args...; kwds...))
@@ -72,9 +72,9 @@ Base.similar(A::PlanarField; kwds...) = similar(A, eltype(A), axes(A); kwds...)
 Base.similar(A::PlanarField, ::Type{T}; kwds...) where {T} = similar(A, T, axes(A); kwds...)
 Base.similar(A::PlanarField, inds::NTuple{2,Union{Integer,ArrayAxisLike}}; kwds...) =
     similar(A, eltype(A), inds; kwds...)
-function Base.similar(A::PlanarField, ::Type{T}, inds::NTuple{2,Union{Integer,ArrayAxisLike}};
+function Base.similar(A::PlanarField, ::Type{T}, inds::ArrayShape{2};
                       step::Number = step(A)) where {T}
-    return PlanarField{T}(Grid(step, to_axes(inds)))
+    return PlanarField{T}(Grid(step, as_array_axes(inds)))
 end
 
 # Retrieve the grid of the nodes.
