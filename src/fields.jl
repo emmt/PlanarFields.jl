@@ -87,6 +87,8 @@ Base.step(A::PlanarField) = getfield(A, :step)
 abscissae(A::PlanarField) = GridAxis(step(A), axes(A)[1])
 ordinates(A::PlanarField) = GridAxis(step(A), axes(A)[2])
 
+Base.view(A::PlanarField, I...) = PlanarField(view(parent(A), I...); step = step(A))
+
 
 # Traits.
 TwoDimensional.coord_type(A::PlanarField) = coord_type(typeof(A))
