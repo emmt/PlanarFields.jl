@@ -84,10 +84,22 @@ Grid{S}(A::PlanarField) where {S<:Number} = Grid{S}(step(A), axes(A))
 # Accessors.
 Base.parent(A::PlanarField) = getfield(A, :vals)
 Base.step(A::PlanarField) = getfield(A, :step)
+abscissae(A::PlanarField) = GridAxis(step(A), axes(A)[1])
+ordinates(A::PlanarField) = GridAxis(step(A), axes(A)[2])
+
 
 # Traits.
 TwoDimensional.coord_type(A::PlanarField) = coord_type(typeof(A))
 TwoDimensional.coord_type(::Type{<:PlanarField{T,S}}) where {T,S} = S
+
+# Properties of PlanarField objects.
+Base.propertynames(::PlanarField) = (:step, :values, :X, :Y)
+Base.getproperty(A::PlanarField, key::Symbol) =
+    key === :step   ? step(A) :
+    key === :values ? parent(A) :
+    key === :X      ? abscissae(A) :
+    key === :Y      ? ordinates(A) :
+    throw(KeyError(key))
 
 # Abstract array API for PlanarField objects.
 Base.length(A::PlanarField) = prod(size(A))

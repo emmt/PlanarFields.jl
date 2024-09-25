@@ -190,8 +190,8 @@ Base.copy(G::Grid) = G
 
 # Accessors for Grid objects.
 Base.step(G::Grid) = getfield(G, :step)
-abscissae(G::Grid{T}) where {T} = GridAxis{T}(step(G), axes(G)[1])
-ordinates(G::Grid{T}) where {T} = GridAxis{T}(step(G), axes(G)[2])
+abscissae(G::Grid) = GridAxis(step(G), axes(G)[1])
+ordinates(G::Grid) = GridAxis(step(G), axes(G)[2])
 
 # Properties of Grid objects.
 Base.propertynames(::Grid) = (:step, :X, :Y)
