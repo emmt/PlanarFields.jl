@@ -130,12 +130,16 @@ function Base.similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{PlanarField
     return PlanarField{T}(axes(bc); step = stp)
 end
 
-# Find suitable common step in broadcasting.
+# Find suitable common step in broadcasting. Starting point is an instance of
+# `Broadcast.Broadcasted`, then possible arguments are: arrays, numbers, instances of
+# `Broadcast.Broadcasted`, etc.
 broadcast_step(bc::Base.Broadcast.Broadcasted) = broadcast_step(nothing, bc.args)
 broadcast_step(s::Union{Nothing,Number}, args::Tuple) = broadcast_step(broadcast_step(s, args[1]), Base.tail(args))
 broadcast_step(s::Union{Nothing,Number}, A::Number) = s
 broadcast_step(s::Nothing, A::PlanarField) = step(A)
 broadcast_step(s::Number, A::PlanarField) = common_step(s, step(A))
+broadcast_step(s::Nothing, A::Broadcast.Broadcasted) = broadcast_step(A)
+broadcast_step(s::Number, A::Broadcast.Broadcasted) = common_step(s, broadcast_step(A))
 broadcast_step(s::Union{Nothing,Number}, ::Tuple{}) = s
 broadcast_step(s::Union{Nothing,Number}, A::Any) = throw(ArgumentError(
     "planar fields can only be combined with planar fields and numbers, got instance of `$(typeof(A))`"))
