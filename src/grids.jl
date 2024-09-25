@@ -46,6 +46,12 @@ Base.IndexStyle(::Type{<:GridAxis}) = IndexLinear()
     return as(T, i*step(A))
 end
 
+Base.first(A::GridAxis) = step(A)*first(eachindex(A))
+Base.last(A::GridAxis) = step(A)*last(eachindex(A))
+
+Base.extrema(A::GridAxis) =
+    isempty(A) ? throw(ArgumentError("grid axis must be non-empty")) : minmax(first(A), last(A))
+
 # Extend methods from other packages.
 TwoDimensional.coord_type(A::GridAxis) = coord_type(typeof(A))
 TwoDimensional.coord_type(::Type{<:GridAxis{T}}) where {T} = T

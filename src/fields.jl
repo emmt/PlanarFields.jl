@@ -89,6 +89,9 @@ ordinates(A::PlanarField) = GridAxis(step(A), axes(A)[2])
 
 Base.view(A::PlanarField, I...) = PlanarField(view(parent(A), I...); step = step(A))
 
+TwoDimensional.BoundingBox(A::PlanarField{T,S}) where {T,S} = BoundingBox{S}(A)
+TwoDimensional.BoundingBox{T}(A::PlanarField) where {T} =
+    BoundingBox{T}(extrema(A.X), extrema(A.Y)) # FIXME: margin?
 
 # Traits.
 TwoDimensional.coord_type(A::PlanarField) = coord_type(typeof(A))
