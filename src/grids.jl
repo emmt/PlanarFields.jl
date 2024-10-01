@@ -1,9 +1,9 @@
 """
-    A = GridAxis{T}(step, inds)
-    A = GridAxis{T}(inds, step)
-    A = GridAxis{T}(inds; step)
+    A = GridAxis{T}(step, rng)
+    A = GridAxis{T}(rng, step)
+    A = GridAxis{T}(rng; step)
 
-Build a grid axis object with element type `T`, indices `inds` and spacing `step`. If `T`
+Build a grid axis object with element type `T`, indices `rng` and spacing `step`. If `T`
 is not specified, it is inferred from the type of `step` promoted to be stable by the
 multiplication by an `Int`.
 
@@ -51,18 +51,6 @@ Base.last(A::GridAxis) = step(A)*last(eachindex(A))
 
 Base.extrema(A::GridAxis) =
     isempty(A) ? throw(ArgumentError("grid axis must be non-empty")) : minmax(first(A), last(A))
-
-# Extend methods from other packages.
-TwoDimensional.coord_type(A::GridAxis) = coord_type(typeof(A))
-TwoDimensional.coord_type(::Type{<:GridAxis{T}}) where {T} = T
-
-# Unary plus.
-Base.:(+)(A::GridAxis) = A
-Base.:(+)(A::Grid) = A
-
-# Unary minus does not change the indices, only the sign of the step.
-Base.:(-)(A::GridAxis) = GridAxis(-step(A), eachindex(A))
-Base.:(-)(A::Grid) = Grid(-step(A), axes(A))
 
 # Extend element type conversion by `map` or by broadcasted call to numeric type
 # constructor.
@@ -217,9 +205,6 @@ Base.IndexStyle(::Type{<:Grid}) = IndexCartesian()
     return Point{T}(step(A)*I[1], step(A)*I[2])
 end
 
-# Extend methods from other packages.
-TwoDimensional.coord_type(G::Grid) = coord_type(typeof(G))
-TwoDimensional.coord_type(::Type{<:Grid{T}}) where {T} = T
 
 """
     G = Grid{T}(step, arr)

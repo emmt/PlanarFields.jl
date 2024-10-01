@@ -1,7 +1,5 @@
 
-const ArrayAxis = AbstractUnitRange{Int}
 const ArrayAxisLike = AbstractUnitRange{<:Integer}
-const ArrayAxes{N} = NTuple{N,ArrayAxis}
 const ArrayAxesLike{N} = NTuple{N,ArrayAxisLike}
 
 """
