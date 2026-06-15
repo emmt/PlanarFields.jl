@@ -10,6 +10,7 @@ TypeUtils = "c3b1956e-8857-4d84-9b79-890df85b1e67"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
+OffsetArrays = "1.17.0"
 TwoDimensional = "0.6.0"
 TypeUtils = "1.2"
 julia = "1"
